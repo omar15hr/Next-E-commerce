@@ -16,7 +16,7 @@ type ValidTypes = 'shirts'|'pants'|'hoodies'|'hats';
 
 interface SeedData {
     categories: string[];
-    products: SeedProduct[],
+    products: SeedProduct[];
 }
 
 
