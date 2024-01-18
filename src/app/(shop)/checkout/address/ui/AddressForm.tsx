@@ -3,6 +3,10 @@
 import clsx from "clsx";
 import { useForm } from "react-hook-form";
 
+import { Country } from "@/interfaces";
+import { useAddressStore } from "@/store";
+import { useEffect } from "react";
+
 type FormInputs = {
   firstName: string;
   lastName: string;
@@ -15,16 +19,31 @@ type FormInputs = {
   rememberAddress: boolean;
 }
 
-export function AddressForm() {
+interface Props {
+  countries: Country[];
+}
 
-  const { handleSubmit, register, formState: { isValid } } = useForm<FormInputs>({
+export function AddressForm({ countries }: Props) {
+
+  const { handleSubmit, register, formState: { isValid }, reset } = useForm<FormInputs>({
     defaultValues: {
 
     }
   });
 
+  const setAddress = useAddressStore( state => state.setAddress );
+  const address = useAddressStore( state => state.address );
+
+  useEffect(() => {
+    if ( address.firstName ) {
+      reset(address)
+    }
+  },[])
+
   const onSubmit = ( data: FormInputs ) => {
     console.log({data});
+
+    setAddress(data);
   }
 
   return (
@@ -85,7 +104,11 @@ export function AddressForm() {
           className="p-2 border rounded-md bg-gray-200" { ...register('country', { required: true })}
         >
           <option value="">[ Seleccione ]</option>
-          <option value="CRI">Costa Rica</option>
+          {
+            countries.map( country => (
+              <option key={ country.id } value={ country.id }>{ country.name }</option>
+            ))
+          }
         </select>
       </div>
 
