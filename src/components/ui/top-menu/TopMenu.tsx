@@ -21,12 +21,14 @@ export function TopMenu () {
     <nav className="flex px-5 justify-between items-center w-full">
       {/* logo */}
       <div>
+
         <Link
           href="/"
         >
           <span className={`${titleFont.className} antialiased font-bold`}>Teslo</span>
           <span> | Shop</span>
         </Link>
+
       </div>
 
       {/* Center menu */}
