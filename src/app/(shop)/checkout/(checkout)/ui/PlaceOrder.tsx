@@ -1,9 +1,13 @@
 'use client';
 
-import { currencyFormat } from "@/utils/currencyFormat";
-import { useAddressStore, useCartStore } from "@/store";
+
 import { useEffect, useState } from "react";
 import clsx from "clsx";
+
+import { placeOrder } from "@/actions";
+import { useAddressStore, useCartStore } from "@/store";
+import { currencyFormat } from "@/utils/currencyFormat";
+
 
 export function PlaceOrder() {
 
@@ -35,7 +39,10 @@ export function PlaceOrder() {
 
     console.log({address, productsToOrder});
 
+    const resp = await placeOrder( productsToOrder, address );
+
     setIsPlacingOrder(false);
+    console.log({resp});
   }
 
 
