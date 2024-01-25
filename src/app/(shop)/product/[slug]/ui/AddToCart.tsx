@@ -1,25 +1,27 @@
-'use client';
+"use client";
+
+import { useState } from "react";
 
 import { QuantitySelector, SizeSelector } from "@/components";
-import { CartProduct, Product, Size } from "@/interfaces";
-import { useCartStore } from "@/store";
-import { useState } from "react";
+import type { CartProduct, Product, Size } from "@/interfaces";
+import { useCartStore } from '@/store';
 
 interface Props {
   product: Product;
 }
 
-export function AddToCart ({product}: Props) {
+export const AddToCart = ({ product }: Props) => {
 
-  const addProductToCart = useCartStore( state => state.addProductToCart );
+  const addProductToCart = useCartStore( state => state.addProductTocart );
 
-  const [size, setSize] = useState<Size|undefined>();
+  const [size, setSize] = useState<Size | undefined>();
   const [quantity, setQuantity] = useState<number>(1);
-  const [posted, setPosted] = useState(false)
+  const [posted, setPosted] = useState(false);
 
   const addToCart = () => {
     setPosted(true);
-    if ( !size ) return;
+
+    if (!size) return;
 
     const cartProduct: CartProduct = {
       id: product.id,
@@ -30,42 +32,38 @@ export function AddToCart ({product}: Props) {
       size: size,
       image: product.images[0]
     }
-    addProductToCart( cartProduct );
+
+    addProductToCart(cartProduct);
     setPosted(false);
     setQuantity(1);
     setSize(undefined);
-  }
+
+
+  };
+
 
   return (
     <>
-      {
-        posted && !size && (
-          <span className="mt-2 text-red-500 fade-in">
-            Debe de seleccionar una talla
-          </span>
-        )
-      }
-      
-      {/* Selector de tallas */}
+      {posted && !size && (
+        <span className="mt-2 text-red-500 fade-in">
+          Debe de seleccionar una talla*
+        </span>
+      )}
+
+      {/* Selector de Tallas */}
       <SizeSelector
-          selectedSize={ size }
-          availableSizes={product.sizes}
-          onSizeChanged={ setSize }
-        />
+        selectedSize={size}
+        availableSizes={product.sizes}
+        onSizeChanged={setSize}
+      />
 
-        {/* Selector de cantidad */}
-        <QuantitySelector
-          quantity={ quantity }
-          onQuantityChanged={ setQuantity }
-        />
+      {/* Selector de Cantidad */}
+      <QuantitySelector quantity={quantity} onQuantityChanged={setQuantity} />
 
-        {/* Boton */}
-        <button 
-          className="btn-primary my-5"
-          onClick={ addToCart }
-        >
-          Agregar al carrito
-        </button>
+      {/* Button */}
+      <button onClick={addToCart} className="btn-primary my-5">
+        Agregar al carrito
+      </button>
     </>
-  )
-}
+  );
+};
