@@ -5,6 +5,8 @@ export * from './address/set-user-address';
 
 export * from './order/get-paginated-orders';
 
+export * from './category/get-category';
+
 export * from './user/get-paginated-users';
 export * from './user/change-user-role';
 
