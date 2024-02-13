@@ -5,6 +5,8 @@ import prisma from '@/lib/prisma';
 import { Gender, Product, Size } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import {v2 as cloudinary} from 'cloudinary';
+cloudinary.config( process.env.CLOUDINARY_URL ?? '' );
 
 
 const productSchema = z.object({
@@ -82,13 +84,29 @@ export const createUpdateProduct = async( formData: FormData ) => {
       })
     }
 
-    console.log({ product });
+    // Proceso de carga y guardado de imagenes
+    // Recorres las imagenes y guardarlas
+    if( formData.getAll('images') ) {
+      const images = await uploadImages( formData.getAll('images') as File[] );
+
+      if( !images ) {
+        throw new Error('No se pudo cargar las imagenes, rollingback');
+      }
+
+      await prisma.productImage.createMany({
+        data: images.map( image => ({
+          url: image!,
+          productId: product.id,
+        }))
+      });
+    }
     
 
     return {
       product
     }
   });
+
 
   revalidatePath('/admin/products');
   revalidatePath(`/admin/product/${ product.slug }`);
@@ -110,7 +128,37 @@ export const createUpdateProduct = async( formData: FormData ) => {
 
 
   
+}
 
 
+const uploadImages = async( images: File[] ) => {
+
+  try {
+    
+    const uploadPromises = images.map( async( image ) => {
+
+      try {
+        
+        const buffer = await image.arrayBuffer();
+        const base64Image = Buffer.from(buffer).toString('base64');
   
+  
+        return cloudinary.uploader.upload(`data:image/png;base64,${ base64Image }`)
+          .then( r => r.secure_url );
+
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    })
+
+
+    const uploadedImages = await Promise.all( uploadPromises );
+    return uploadedImages;
+
+
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 }
