@@ -3,6 +3,7 @@
 
 import prisma from '@/lib/prisma';
 import { Gender, Product, Size } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 
@@ -44,7 +45,8 @@ export const createUpdateProduct = async( formData: FormData ) => {
   const { id, ...rest } = product;
 
 
-  const prismaTx = await prisma.$transaction( async(tx) => {
+  try {
+    const prismaTx = await prisma.$transaction( async(tx) => {
 
     let product: Product;
     const tagsArray = rest.tags.split(',').map( tag => tag.trim().toLowerCase() );
@@ -88,12 +90,27 @@ export const createUpdateProduct = async( formData: FormData ) => {
     }
   });
 
-
-  
+  revalidatePath('/admin/products');
+  revalidatePath(`/admin/product/${ product.slug }`);
+  revalidatePath(`/products/${ product.slug }`);
 
 
   return {
     ok: true,
+    product: prismaTx.product
   }
 
+
+  } catch (error) {
+    return {
+      ok: false,
+      message: 'Revisar los logs, no se pudo actualizar/crear'
+    }
+  }
+
+
+  
+
+
+  
 }
