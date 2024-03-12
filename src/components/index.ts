@@ -8,11 +8,7 @@ export * from './products/product-grid/ProductGridItem';
 export * from './orders/OrderStatus';
 
 
-<<<<<<< HEAD
 export * from './paypal/PaypalButton'
-=======
-export * from './paypal/PaypalButton';
->>>>>>> cambios-oh-sports
 
 
 export * from './providers/Providers';
